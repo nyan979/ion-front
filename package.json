@@ -1,0 +1,19 @@
+{
+  "name": "ion-front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "express": "^4.18.2",
+    "ion-sdk-js": "^1.8.2",
+    "nodemon": "^2.0.20",
+    "uuid": "^9.0.0"
+  }
+}
