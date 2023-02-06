@@ -27,7 +27,7 @@ spec:
         io.kompose.service: app-room
     spec:
       containers:
-        - image: elzdar/vidconf-ion_app-room:1.10.0.9
+        - image: elzdar/vidconf-ion_app-room:2
           name: app-room
           resources: {}
           volumeMounts:
