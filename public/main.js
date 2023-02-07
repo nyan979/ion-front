@@ -20,13 +20,16 @@ let localDataChannel;
 let trackEvent;
 
 // const url = 'http://192.168.170.138:5551';
-const url = 'http://localhost:5551';
+const url = "http://signal.dev2.ar2";
+// const url = 'http://localhost:5551';
 const uid = uuid();
-const sid = "291ff23c-045b-45f2-971b-60c16966fe61";
+// const uid = "b91c1659-c6f0-4262-bf93-74d3b0146094";
+const sid = "32dc36f0-8ff9-4d71-a124-fd416e19ef77";
 let room;
 let rtc;
 let localStream;
 let start;
+let presignedUrl;
 
 const join = async () => {
     console.log("[join]: sid="+sid+" uid=", uid)
@@ -182,24 +185,18 @@ const send = () => {
       return
     };
 
-    var base64String = ""
-
-    var file = document.getElementById("file").files[0];
-    getBase64(file).then(
-      data => (base64String = data)
-    );
-
     var attachment = {
       name: "testFile",
       size: 100,
-      data: base64String
+      filePath: localData.value, //<<--- set this to 'filepath' from presigned upload GET response
     };
 
     var data = {
       uid: uid,
       name: "test",
       text: localData.value,
-      base64File: attachment
+      file: attachment,
+      mimeType: "testType"
     };
 
     let map = new Map();
@@ -316,13 +313,4 @@ function syntaxHighlight(json) {
       return '<span class="' + cls + '">' + match + "</span>";
     }
   );
-}
-
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
 }
