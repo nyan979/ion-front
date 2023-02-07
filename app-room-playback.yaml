@@ -27,7 +27,7 @@ spec:
         io.kompose.service: app-room-playback
     spec:
       containers:
-        - image: howeli/vidconf-ion_app-room-playback:0.7.0.9
+        - image: main-439f9b0
           name: app-room-playback
           resources: {}
           volumeMounts:
