@@ -27,7 +27,7 @@ spec:
         io.kompose.service: app-room
     spec:
       containers:
-        - image: main-439f9b0
+        - image: app-room-mgmt:main-406a1d4
           name: app-room
           resources: {}
           volumeMounts:
