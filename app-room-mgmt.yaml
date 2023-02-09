@@ -27,7 +27,7 @@ spec:
         io.kompose.service: app-room
     spec:
       containers:
-        - image: /nyan979/testpackage_app-room-mgmt:main-2b6247f
+        - image: ghcr.io/nyan979/testpackage_app-room-mgmt:main-504578f
           name: app-room
           resources: {}
           volumeMounts:
