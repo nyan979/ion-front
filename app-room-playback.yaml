@@ -27,7 +27,7 @@ spec:
         io.kompose.service: app-room-playback
     spec:
       containers:
-        - image: app-room-playback:main-406a1d4
+        - image: app-room-playback:main-4099709
           name: app-room-playback
           resources: {}
           volumeMounts:
