@@ -1,0 +1,123 @@
+[2022-12-19 12:32:55.206]  INFO default: [sfu.go:95] [sfu.(*Config).Load] config ../../configs/sfu.toml load ok! 
+[2022-12-19 12:32:55.206]  INFO default: [main.go:49] [main.main] --- starting sfu node --- 
+[2022-12-19 12:32:55.206]  INFO default: [main.go:40] [main.main.func1] start pprof on :6060 
+[2022-12-19 12:32:55.207] ERROR default: [main.go:43] [main.main.func1] http.ListenAndServe err=listen tcp :6060: bind: address already in use 
+[2022-12-19 12:32:55.207]  INFO default: [postgres_service.go:26] [postgres.GetPostgresDB] --- Connecting to PostgreSql --- 
+[2022-12-19 12:32:55.212]  INFO default: [service.go:55] [sfu.NewSFUService] STUN SERVER LIST : [{[stun:172.18.0.1:3478]  }] 
+[2022-12-19 12:32:55.212] [INFO] [sfu.go:92] => Listen on  logger=ion-sfu-node/sfu single-port=5000 v=0
+[2022-12-19 12:32:55.212] [INFO] [sfu.go:129] => Listen on Ice Server=[{"credential":"","urls":["stun:172.18.0.1:3478"]}] logger=ion-sfu-node/sfu v=0
+[2022-12-19 12:32:55.212]  INFO nats-grpc.Server: [server.go:145] [rpc.(*Server).RegisterService] QueueSubscribe: subject => nrpc.sfu-CH2MG4.rtc.RTC.>, queue => rtc.RTC self-nid=sfu-CH2MG4
+[2022-12-19 12:32:55.213]  INFO nats-grpc.Server: [server.go:159] [rpc.(*Server).RegisterService] RegisterService: stream path => nrpc.sfu-CH2MG4.rtc.RTC.Signal self-nid=sfu-CH2MG4
+[2022-12-19 12:32:55.213]  INFO nats-grpc.Server: [server.go:167] [rpc.(*Server).register] RegisterService("rtc.RTC") self-nid=sfu-CH2MG4
+[2022-12-19 12:32:55.213]  INFO nats-grpc.Server: [server.go:145] [rpc.(*Server).RegisterService] QueueSubscribe: subject => nrpc.sfu-CH2MG4.grpc.reflection.v1alpha.ServerReflection.>, queue => grpc.reflection.v1alpha.ServerReflection self-nid=sfu-CH2MG4
+[2022-12-19 12:32:55.213]  INFO nats-grpc.Server: [server.go:159] [rpc.(*Server).RegisterService] RegisterService: stream path => nrpc.sfu-CH2MG4.grpc.reflection.v1alpha.ServerReflection.ServerReflectionInfo self-nid=sfu-CH2MG4
+[2022-12-19 12:32:55.213]  INFO nats-grpc.Server: [server.go:167] [rpc.(*Server).register] RegisterService("grpc.reflection.v1alpha.ServerReflection") self-nid=sfu-CH2MG4
+[2022-12-19 12:32:55.213]  INFO nats-discovery.Client: [client.go:53] [client.(*Client).Get] Get: subj=node.publish.* 
+[2022-12-19 12:32:55.214]  INFO nats-discovery.Client: [client.go:67] [client.(*Client).Get] nodes [{dc1 rtc sfu-KbVbjI {nats-grpc nats://127.0.0.1:4222 map[]} map[]} {dc1 rtc sfu-CH2MG4 {nats-grpc nats://127.0.0.1:4222 map[]} map[]} {dc1 islb islb-376hUP {nats-grpc nats://127.0.0.1:4222 map[]} map[]} {dc1 signal signal-aJaYfw {nats-grpc nats://127.0.0.1:4222 map[]} map[]} {dc1 room room-uqwOwa {nats-grpc nats://127.0.0.1:4222 map[]} map[]}] 
+[2022-12-19 12:32:55.214]  INFO default: [node.go:131] [ion.(*Node).handleNeighborNodes] Service up: rtc node id => [sfu-KbVbjI], rpc => nats-grpc 
+[2022-12-19 12:32:55.214]  INFO default: [node.go:131] [ion.(*Node).handleNeighborNodes] Service up: rtc node id => [sfu-CH2MG4], rpc => nats-grpc 
+[2022-12-19 12:32:55.214]  INFO default: [node.go:131] [ion.(*Node).handleNeighborNodes] Service up: islb node id => [islb-376hUP], rpc => nats-grpc 
+[2022-12-19 12:32:55.214]  INFO default: [node.go:131] [ion.(*Node).handleNeighborNodes] Service up: signal node id => [signal-aJaYfw], rpc => nats-grpc 
+[2022-12-19 12:32:55.214]  INFO default: [node.go:131] [ion.(*Node).handleNeighborNodes] Service up: room node id => [room-uqwOwa], rpc => nats-grpc 
+[2022-12-19 12:33:07.852]  INFO default: [service.go:166] [sfu.(*SFUService).Signal] Created new signal and peer 
+[2022-12-19 12:33:07.852]  INFO default: [service.go:226] [sfu.(*SFUService).Signal] [C=>S] join: sid => 225f02f3-d884-402e-894b-00d906210a86, uid => 3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec 
+[2022-12-19 12:33:07.852]  INFO default: [service.go:267] [sfu.(*SFUService).Signal] NO PUBLISH:  
+[2022-12-19 12:33:07.852]  INFO default: [service.go:273] [sfu.(*SFUService).Signal] NO SUBSCRIBE:  
+[2022-12-19 12:33:07.852]  INFO default: [service.go:279] [sfu.(*SFUService).Signal] NO AUTOSUBSCRIBE:  
+[2022-12-19 12:33:07.853] [INFO] [peer.go:185] => PeerLocal join SessionLocal logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec session_id=225f02f3-d884-402e-894b-00d906210a86 v=0
+[2022-12-19 12:33:07.853] DEBUG default: [service.go:322] [sfu.(*SFUService).Signal] [C=>S] join.description: offer v=0
+o=- 9204210795901231334 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE 0
+a=extmap-allow-mixed
+a=msid-semantic: WMS
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=ice-ufrag:4WTe
+a=ice-pwd:VX9ueF+LcobVlkDBr8v4bKkX
+a=ice-options:trickle
+a=fingerprint:sha-256 2A:4F:18:D3:EC:CD:31:20:83:22:DB:74:BC:DC:82:7E:22:AC:D0:7E:8D:DE:E0:C3:34:48:79:AF:B7:34:C3:72
+a=setup:actpass
+a=mid:0
+a=sctp-port:5000
+a=max-message-size:262144
+ 
+[2022-12-19 12:33:07.853] [INFO] [peer.go:199] => PeerLocal got offer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:07.854] [DEBUG] [publisher.go:117] => ice connection status logger=ion-sfu-node/sfu state=checking v=1
+[2022-12-19 12:33:07.854] [INFO] [peer.go:210] => PeerLocal send answer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:07.854] [DEBUG] [peer.go:165] => on publisher ice candidate called for peer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:07.854] DEBUG default: [service.go:329] [sfu.(*SFUService).Signal] [S=>C] join.description: answer v=0
+o=- 9067104649873780614 1671424387 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 04:A8:25:52:26:20:76:6D:13:FA:94:6C:AC:10:81:E6:49:83:B8:EB:2D:86:76:20:E6:A3:3B:B3:06:ED:89:73
+a=group:BUNDLE 0
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:active
+a=mid:0
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:JswynILHAmZEBnGe
+a=ice-pwd:GGHOjdeVuDPxWRlntZmHyFtCZtjswyRm
+ 
+[2022-12-19 12:33:07.854] DEBUG default: [service.go:232] [sfu.(*SFUService).Signal.func2] [S=>C] peer.OnIceCandidate: target = 0, candidate = candidate:3308009161 1 udp 2130706431 172.19.0.1 5000 typ host 
+[2022-12-19 12:33:07.854] [DEBUG] [peer.go:165] => on publisher ice candidate called for peer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:07.854]  INFO default: [service.go:387] [sfu.(*SFUService).Signal] Peer no: 0, uid: 3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec 
+[2022-12-19 12:33:07.854] DEBUG default: [service.go:513] [sfu.(*SFUService).Signal] [C=>S] trickle: target 0, candidate candidate:2303368507 1 udp 2122260223 172.19.0.1 59072 typ host generation 0 ufrag 4WTe network-id 1 
+[2022-12-19 12:33:07.854] [INFO] [peer.go:243] => PeerLocal trickle logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:07.854] DEBUG default: [service.go:232] [sfu.(*SFUService).Signal.func2] [S=>C] peer.OnIceCandidate: target = 0, candidate = candidate:3295997501 1 udp 1694498815 172.18.0.1 37491 typ srflx raddr 0.0.0.0 rport 37491 
+[2022-12-19 12:33:07.854] DEBUG default: [service.go:513] [sfu.(*SFUService).Signal] [C=>S] trickle: target 0, candidate candidate:3888547450 1 udp 2122194687 172.18.0.1 59134 typ host generation 0 ufrag 4WTe network-id 2 
+[2022-12-19 12:33:07.854] [INFO] [peer.go:243] => PeerLocal trickle logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:07.854] DEBUG default: [service.go:513] [sfu.(*SFUService).Signal] [C=>S] trickle: target 0, candidate candidate:3234137358 1 udp 2122129151 192.168.0.114 52548 typ host generation 0 ufrag 4WTe network-id 3 network-cost 10 
+[2022-12-19 12:33:07.854] [DEBUG] [peer.go:165] => on publisher ice candidate called for peer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:07.854] [INFO] [peer.go:243] => PeerLocal trickle logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:07.857] [DEBUG] [publisher.go:117] => ice connection status logger=ion-sfu-node/sfu state=connected v=1
+[2022-12-19 12:33:08.104] [DEBUG] [peer.go:124] => Negotiation needed logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:08.105] [INFO] [peer.go:133] => Send offer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:08.105] DEBUG default: [service.go:252] [sfu.(*SFUService).Signal.func3] [S=>C] peer.OnOffer: v=0
+o=- 4123311220229910675 1671424388 IN IP4 0.0.0.0
+s=-
+t=0 0
+a=fingerprint:sha-256 D1:6B:26:5A:80:1D:F0:B8:7D:DB:B2:B4:D4:B1:97:0B:52:CC:D6:2F:83:E8:B0:15:86:7C:F5:31:08:C3:3F:FC
+a=group:BUNDLE 0
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=setup:actpass
+a=mid:0
+a=sendrecv
+a=sctp-port:5000
+a=ice-ufrag:ghYhqPRrbVYHwNTe
+a=ice-pwd:yyimWjjlyxdonniqezqZnyzkvKvkBkUG
+ 
+[2022-12-19 12:33:08.105] [DEBUG] [peer.go:139] => On subscriber ice candidate called for peer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:08.106] DEBUG default: [service.go:232] [sfu.(*SFUService).Signal.func2] [S=>C] peer.OnIceCandidate: target = 1, candidate = candidate:3308009161 1 udp 2130706431 172.19.0.1 5000 typ host 
+[2022-12-19 12:33:08.106] [DEBUG] [peer.go:139] => On subscriber ice candidate called for peer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:08.106] DEBUG default: [service.go:232] [sfu.(*SFUService).Signal.func2] [S=>C] peer.OnIceCandidate: target = 1, candidate = candidate:3295997501 1 udp 1694498815 172.18.0.1 43769 typ srflx raddr 0.0.0.0 rport 43769 
+[2022-12-19 12:33:08.106] [DEBUG] [peer.go:139] => On subscriber ice candidate called for peer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=1
+[2022-12-19 12:33:08.114] DEBUG default: [service.go:467] [sfu.(*SFUService).Signal] [C=>S] description: answer v=0
+o=- 7544562120213599292 2 IN IP4 127.0.0.1
+s=-
+t=0 0
+a=group:BUNDLE 0
+a=msid-semantic: WMS
+m=application 9 UDP/DTLS/SCTP webrtc-datachannel
+c=IN IP4 0.0.0.0
+a=ice-ufrag:pUF0
+a=ice-pwd:qfNsDVewuTR1KGzPdPSH0LFs
+a=ice-options:trickle
+a=fingerprint:sha-256 96:F7:C7:8F:27:3D:54:48:C8:5E:DE:0D:72:FE:D0:AF:F7:2A:9A:71:11:5E:5B:BA:FD:B0:20:5E:C6:8F:A7:E9
+a=setup:active
+a=mid:0
+a=sctp-port:5000
+ 
+[2022-12-19 12:33:08.114] [INFO] [peer.go:223] => PeerLocal got answer logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:08.114] [DEBUG] [subscriber.go:58] => ice connection status logger=ion-sfu-node/sfu state=checking v=1
+[2022-12-19 12:33:08.115] DEBUG default: [service.go:513] [sfu.(*SFUService).Signal] [C=>S] trickle: target 0, candidate candidate:2633783039 1 udp 2122260223 172.19.0.1 43912 typ host generation 0 ufrag pUF0 network-id 1 
+[2022-12-19 12:33:08.116] [INFO] [peer.go:243] => PeerLocal trickle logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:08.117] DEBUG default: [service.go:513] [sfu.(*SFUService).Signal] [C=>S] trickle: target 0, candidate candidate:3581136586 1 udp 2122129151 192.168.0.114 34691 typ host generation 0 ufrag pUF0 network-id 3 network-cost 10 
+[2022-12-19 12:33:08.117] [INFO] [peer.go:243] => PeerLocal trickle logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:08.117] DEBUG default: [service.go:513] [sfu.(*SFUService).Signal] [C=>S] trickle: target 0, candidate candidate:4067446206 1 udp 2122194687 172.18.0.1 39484 typ host generation 0 ufrag pUF0 network-id 2 
+[2022-12-19 12:33:08.117] [INFO] [peer.go:243] => PeerLocal trickle logger=ion-sfu-node/sfu peer_id=3e45f7ab-7d9c-410d-a3ea-cc56ed3842ec v=0
+[2022-12-19 12:33:09.153] [DEBUG] [subscriber.go:58] => ice connection status logger=ion-sfu-node/sfu state=connected v=1

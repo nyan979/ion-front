@@ -20,20 +20,21 @@ let localDataChannel;
 let trackEvent;
 
 // const url = 'http://192.168.170.138:5551';
-const url = "http://signal.dev2.ar2";
-// const url = 'http://localhost:5551';
+// const url = "http://signal.dev2.ar2";
+const url = 'https://localhost:5551';
 const uid = uuid();
-// const uid = "b91c1659-c6f0-4262-bf93-74d3b0146094";
-const sid = "32dc36f0-8ff9-4d71-a124-fd416e19ef77";
+// const uid = "221d1c91-120d-4b53-8b51-8caec4154cf4";
+const sid = "2de9fffc-b1e2-467e-9ef7-e96017c9b08f";
 let room;
 let rtc;
 let localStream;
 let start;
 let presignedUrl;
+let connector;
 
 const join = async () => {
     console.log("[join]: sid="+sid+" uid=", uid)
-    const connector = new Ion.Connector(url, "token");
+    connector = new Ion.Connector(url, "token");
     
     connector.onopen = function (service){
         console.log("[onopen]: service = ", service.name);
@@ -103,6 +104,7 @@ const join = async () => {
             leaveBtn.removeAttribute('disabled');
             publishBtn.removeAttribute('disabled');
             publishSBtn.removeAttribute('disabled');
+
 
             rtc = new Ion.RTC(connector);
 
@@ -177,6 +179,77 @@ const join = async () => {
     });
 }
 
+const joinRTC = () => {
+  rtc = new Ion.RTC(connector);
+  rtc.ontrack = (track, stream) => {
+    console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
+    if (track.kind === "video") {
+      track.onunmute = () => {
+        if (!streams[stream.id]) {
+          const remoteVideo = document.createElement("video");
+          remoteVideo.srcObject = stream;
+          remoteVideo.autoplay = true;
+          remoteVideo.muted = true;
+          remoteVideo.addEventListener("loadedmetadata", function () {
+            sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+          });
+  
+          remoteVideo.onresize = function () {
+            sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+          };
+          remotesDiv.appendChild(remoteVideo);
+          streams[stream.id] = stream;
+          stream.onremovetrack = () => {
+            if (streams[stream.id]) {
+              remotesDiv.removeChild(remoteVideo);
+              streams[stream.id] = null;
+            }
+          };
+          getStats();
+        }
+      };
+    }
+  };
+
+  rtc.ontrackevent = function (ev) {
+    console.log("ontrackevent: \nuid = ", ev.uid, " \nstate = ", ev.state, ", \ntracks = ", JSON.stringify(ev.tracks));
+    if (trackEvent === undefined) {
+      console.log("store trackEvent=", ev)
+      trackEvent = ev;
+    }
+    remoteSignal.innerHTML = remoteSignal.innerHTML + JSON.stringify(ev) + '\n';
+  };
+
+  rtc.join(sid, uid);
+
+  const streams = {};
+
+  start = (sc) => {
+    publishSBtn.disabled = "true";
+    publishBtn.disabled = "true";
+
+    let constraints = {
+      resolution: resolutionBox.options[resolutionBox.selectedIndex].value,
+      codec: codecBox.options[codecBox.selectedIndex].value,
+      audio: true,
+      simulcast: sc,
+    }
+    console.log("getUserMedia constraints=", constraints)
+    Ion.LocalStream.getUserMedia(constraints)
+      .then((media) => {
+        localStream = media;
+        localVideo.srcObject = media;
+        localVideo.autoplay = true;
+        localVideo.controls = true;
+        localVideo.muted = true;
+
+        rtc.publish(media);
+        localDataChannel = rtc.createDataChannel(uid);
+      })
+      .catch(console.error);
+  };
+}
+
 const send = () => {
     if (!room) {
         alert('join room first!', '', {
@@ -188,7 +261,7 @@ const send = () => {
     var attachment = {
       name: "testFile",
       size: 100,
-      filePath: localData.value, //<<--- set this to 'filepath' from presigned upload GET response
+      file_path: localData.value, //<<--- set this to 'filepath' from presigned upload GET response
     };
 
     var data = {
@@ -196,7 +269,7 @@ const send = () => {
       name: "test",
       text: localData.value,
       file: attachment,
-      mimeType: "testType"
+      mime_type: "attachment"
     };
 
     let map = new Map();
