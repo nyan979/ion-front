@@ -19,12 +19,31 @@ const brTag = document.getElementById("br-tag");
 let localDataChannel;
 let trackEvent;
 
-// const url = 'http://192.168.170.138:5551';
+const url = 'http://192.168.170.138:5551';
 // const url = "http://signal.dev2.ar2";
-const url = 'https://localhost:5551';
+// const url = 'https://localhost:5551';
 const uid = uuid();
 // const uid = "221d1c91-120d-4b53-8b51-8caec4154cf4";
-const sid = "2de9fffc-b1e2-467e-9ef7-e96017c9b08f";
+const sid = "b65279cc-10d9-4dd5-8250-1f7f745e2227";
+// const config = {
+//   iceServers: [
+//       {
+//           urls: ['stun:ucs.dev2.ar2:3478'],
+//       },
+//   ],
+// }
+const config = {
+  iceServers: [
+    {
+      urls: ['stun:ucs.dev2.ar2:3478'],
+    },
+    // {
+    //   urls: ['turn:ucs-turn.dev2.ar2:3478'],
+    //   username: "pion",
+    //   credential: "ion",
+    // },
+  ],
+}
 let room;
 let rtc;
 let localStream;
@@ -105,8 +124,8 @@ const join = async () => {
             publishBtn.removeAttribute('disabled');
             publishSBtn.removeAttribute('disabled');
 
-
-            rtc = new Ion.RTC(connector);
+            rtc = new Ion.RTC(connector, config);
+            // rtc = new Ion.RTC(connector);
 
             rtc.ontrack = (track, stream) => {
               console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
@@ -136,6 +155,7 @@ const join = async () => {
                   }
                 };
               }
+              subscribe();
             };
 
             rtc.ontrackevent = function (ev) {
