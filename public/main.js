@@ -19,23 +19,25 @@ const brTag = document.getElementById("br-tag");
 let localDataChannel;
 let trackEvent;
 
-const url = 'http://192.168.170.138:5551';
+// const url = 'http://vidconf-signal:5551';
+const url = "https://ucs-signal.soh-dev.agilrad.com";
 // const url = "http://signal.dev2.ar2";
 // const url = 'https://localhost:5551';
 const uid = uuid();
 // const uid = "221d1c91-120d-4b53-8b51-8caec4154cf4";
-const sid = "b65279cc-10d9-4dd5-8250-1f7f745e2227";
+const sid = "c6e5110c-5984-41c3-a18c-86f18d3e7ff5";
+// const sid = "86f7340c-ff10-4053-8575-ab3a6169c896";
 // const config = {
 //   iceServers: [
 //       {
-//           urls: ['stun:ucs.dev2.ar2:3478'],
+//           urls: ['stun:ucs-stun.soh-dev.agilrad.com:3478'],
 //       },
 //   ],
 // }
 const config = {
   iceServers: [
     {
-      urls: ['stun:ucs.dev2.ar2:3478'],
+      urls: ['stun:stun.l.google.com:19302?transport=udp'],
     },
     // {
     //   urls: ['turn:ucs-turn.dev2.ar2:3478'],
@@ -52,6 +54,14 @@ let presignedUrl;
 let connector;
 
 const join = async () => {
+    const originalSend = WebSocket.prototype.send;
+    window.sockets = [];
+    WebSocket.prototype.send = function(...args) {
+      if (window.sockets.indexOf(this) === -1)
+        window.sockets.push(this);
+      return originalSend.call(this, ...args);
+    };
+
     console.log("[join]: sid="+sid+" uid=", uid)
     connector = new Ion.Connector(url, "token");
     
@@ -63,8 +73,9 @@ const join = async () => {
         console.log('[onclose]: service = ' + service.name);
     };
 
-
     room = new Ion.Room(connector);
+
+    
     
     room.onjoin = function (result){
         console.log('[onjoin]: success ' + result.success + ', room info: ' + JSON.stringify(result.room));
@@ -111,7 +122,7 @@ const join = async () => {
         extrainfo: '',
         destination: 'webrtc://ion/peer1',
         role: Ion.Role.HOST,
-        protocol: Ion.Protocol.WEBRTC ,
+        protocol: Ion.Protocol.WEBRTC,
         avatar: 'string',
         direction: Ion.Direction.INCOMING,
         vendor: 'string',
@@ -123,6 +134,8 @@ const join = async () => {
             leaveBtn.removeAttribute('disabled');
             publishBtn.removeAttribute('disabled');
             publishSBtn.removeAttribute('disabled');
+
+            setInterval(pingWebSocket, 30000);
 
             rtc = new Ion.RTC(connector, config);
             // rtc = new Ion.RTC(connector);
@@ -191,7 +204,11 @@ const join = async () => {
                   localVideo.muted = true;
 
                   rtc.publish(media);
-                  localDataChannel = rtc.createDataChannel(uid);
+                  localDataChannel = rtc.createDataChannel('ion-sfu');
+                  localDataChannel.onopen = () => localDataChannel.send("Hello World");
+                  localDataChannel.onmessage = function (msg){
+                    console.log('[onmessage]: Received msg:',  msg);
+                  };
                 })
                 .catch(console.error);
             };
@@ -270,6 +287,18 @@ const joinRTC = () => {
   };
 }
 
+const pingWebSocket = () => {
+  var msg = new Blob([""], { type: "text/plain" });
+  if (sockets.length > 0) {
+    sockets.forEach(function (socket) {
+      if (socket.readyState === 1) {
+        socket.send(msg);
+        console.log("Pinging every 30 secs at ", socket.url);
+      }
+    });
+  }
+}
+
 const send = () => {
     if (!room) {
         alert('join room first!', '', {
@@ -298,6 +327,13 @@ const send = () => {
     room.message(sid, uid, "all", 'Map', map);
 }
 
+const pingRTC = () => {
+    ws.onopen = function() {         
+      // Web Socket is connected, send data using send()
+      ws.send("Ping RTC");
+      console.log("Pinging every 1sec (RTC)");
+    };
+};
 
 const leave = () => {
     console.log("[leave]: sid=" + sid + " uid=", uid)
