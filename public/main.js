@@ -22,11 +22,11 @@ let trackEvent;
 // const url = 'http://vidconf-signal:5551';
 const url = "https://ucs-signal.soh-dev.agilrad.com";
 // const url = "http://signal.dev2.ar2";
-// const url = 'https://localhost:5551';
+// const url = 'http://localhost:5551';
 const uid = uuid();
 // const uid = "221d1c91-120d-4b53-8b51-8caec4154cf4";
-const sid = "c6e5110c-5984-41c3-a18c-86f18d3e7ff5";
-// const sid = "86f7340c-ff10-4053-8575-ab3a6169c896";
+const sid = "c6e5110c-5984-41c3-a18c-86f18d3e7ff5"; //<-soh
+// const sid = "ed14ce18-41f9-45e0-b6f6-c6481657571d"; //<-138
 // const config = {
 //   iceServers: [
 //       {
@@ -74,8 +74,6 @@ const join = async () => {
     };
 
     room = new Ion.Room(connector);
-
-    
     
     room.onjoin = function (result){
         console.log('[onjoin]: success ' + result.success + ', room info: ' + JSON.stringify(result.room));
@@ -137,8 +135,8 @@ const join = async () => {
 
             setInterval(pingWebSocket, 30000);
 
-            rtc = new Ion.RTC(connector, config);
-            // rtc = new Ion.RTC(connector);
+            // rtc = new Ion.RTC(connector, config);
+            rtc = new Ion.RTC(connector);
 
             rtc.ontrack = (track, stream) => {
               console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
@@ -212,79 +210,7 @@ const join = async () => {
                 })
                 .catch(console.error);
             };
-            
     });
-}
-
-const joinRTC = () => {
-  rtc = new Ion.RTC(connector);
-  rtc.ontrack = (track, stream) => {
-    console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
-    if (track.kind === "video") {
-      track.onunmute = () => {
-        if (!streams[stream.id]) {
-          const remoteVideo = document.createElement("video");
-          remoteVideo.srcObject = stream;
-          remoteVideo.autoplay = true;
-          remoteVideo.muted = true;
-          remoteVideo.addEventListener("loadedmetadata", function () {
-            sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
-          });
-  
-          remoteVideo.onresize = function () {
-            sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
-          };
-          remotesDiv.appendChild(remoteVideo);
-          streams[stream.id] = stream;
-          stream.onremovetrack = () => {
-            if (streams[stream.id]) {
-              remotesDiv.removeChild(remoteVideo);
-              streams[stream.id] = null;
-            }
-          };
-          getStats();
-        }
-      };
-    }
-  };
-
-  rtc.ontrackevent = function (ev) {
-    console.log("ontrackevent: \nuid = ", ev.uid, " \nstate = ", ev.state, ", \ntracks = ", JSON.stringify(ev.tracks));
-    if (trackEvent === undefined) {
-      console.log("store trackEvent=", ev)
-      trackEvent = ev;
-    }
-    remoteSignal.innerHTML = remoteSignal.innerHTML + JSON.stringify(ev) + '\n';
-  };
-
-  rtc.join(sid, uid);
-
-  const streams = {};
-
-  start = (sc) => {
-    publishSBtn.disabled = "true";
-    publishBtn.disabled = "true";
-
-    let constraints = {
-      resolution: resolutionBox.options[resolutionBox.selectedIndex].value,
-      codec: codecBox.options[codecBox.selectedIndex].value,
-      audio: true,
-      simulcast: sc,
-    }
-    console.log("getUserMedia constraints=", constraints)
-    Ion.LocalStream.getUserMedia(constraints)
-      .then((media) => {
-        localStream = media;
-        localVideo.srcObject = media;
-        localVideo.autoplay = true;
-        localVideo.controls = true;
-        localVideo.muted = true;
-
-        rtc.publish(media);
-        localDataChannel = rtc.createDataChannel(uid);
-      })
-      .catch(console.error);
-  };
 }
 
 const pingWebSocket = () => {
@@ -326,14 +252,6 @@ const send = () => {
     console.log("[send]: sid=", sid, "from=", 'sender', "to=", uid, "payload=", map);
     room.message(sid, uid, "all", 'Map', map);
 }
-
-const pingRTC = () => {
-    ws.onopen = function() {         
-      // Web Socket is connected, send data using send()
-      ws.send("Ping RTC");
-      console.log("Pinging every 1sec (RTC)");
-    };
-};
 
 const leave = () => {
     console.log("[leave]: sid=" + sid + " uid=", uid)
