@@ -1,4 +1,5 @@
 const localVideo = document.getElementById("local-video");
+const localVideo2 = document.getElementById("local-video2");
 const remotesDiv = document.getElementById("remotes");
 
 /* eslint-env browser */
@@ -19,14 +20,15 @@ const brTag = document.getElementById("br-tag");
 let localDataChannel;
 let trackEvent;
 
-// const url = 'http://vidconf-signal:5551';
-const url = "https://ucs-signal.soh-dev.agilrad.com";
+// const url = 'http://vidconf:5551';
+// const url = "https://ucs-signal.soh-dev.agilrad.com";
 // const url = "http://signal.dev2.ar2";
-// const url = 'http://localhost:5551';
+const url = 'http://localhost:5551';
 const uid = uuid();
 // const uid = "221d1c91-120d-4b53-8b51-8caec4154cf4";
-const sid = "c6e5110c-5984-41c3-a18c-86f18d3e7ff5"; //<-soh
-// const sid = "ed14ce18-41f9-45e0-b6f6-c6481657571d"; //<-138
+const sid = "cbc700c7-d909-4c6d-ad11-f81681b82141"; //soh
+// const sid = "60d76c67-66ef-461f-8a96-26dd3d56b012"; //138
+// const sid = "a62c6cfd-a94f-4e33-a28e-054c9e956196"; //dev2
 // const config = {
 //   iceServers: [
 //       {
@@ -37,7 +39,7 @@ const sid = "c6e5110c-5984-41c3-a18c-86f18d3e7ff5"; //<-soh
 const config = {
   iceServers: [
     {
-      urls: ['stun:stun.l.google.com:19302?transport=udp'],
+      urls: ['stun:stunserver.soh-dev.agilrad.com:3478'],
     },
     // {
     //   urls: ['turn:ucs-turn.dev2.ar2:3478'],
@@ -52,15 +54,16 @@ let localStream;
 let start;
 let presignedUrl;
 let connector;
+let sockets = [];
 
 const join = async () => {
-    const originalSend = WebSocket.prototype.send;
-    window.sockets = [];
-    WebSocket.prototype.send = function(...args) {
-      if (window.sockets.indexOf(this) === -1)
-        window.sockets.push(this);
-      return originalSend.call(this, ...args);
-    };
+    // const originalSend = WebSocket.prototype.send;
+    // WebSocket.prototype.send = function(...args) {
+    //   if (sockets.indexOf(this) === -1)
+    //     sockets.push(this);
+    //   console.log(sockets)
+    //   return originalSend.call(this, ...args);
+    // };
 
     console.log("[join]: sid="+sid+" uid=", uid)
     connector = new Ion.Connector(url, "token");
@@ -133,10 +136,10 @@ const join = async () => {
             publishBtn.removeAttribute('disabled');
             publishSBtn.removeAttribute('disabled');
 
-            setInterval(pingWebSocket, 30000);
+            // setInterval(pingWebSocket, 2000);
 
-            // rtc = new Ion.RTC(connector, config);
-            rtc = new Ion.RTC(connector);
+            rtc = new Ion.RTC(connector, config);
+            // rtc = new Ion.RTC(connector);
 
             rtc.ontrack = (track, stream) => {
               console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
@@ -176,6 +179,7 @@ const join = async () => {
                 trackEvent = ev;
               }
               remoteSignal.innerHTML = remoteSignal.innerHTML + JSON.stringify(ev) + '\n';
+              subscribe();
             };
 
             rtc.join(sid, uid);
@@ -193,6 +197,17 @@ const join = async () => {
                 simulcast: sc,
               }
               console.log("getUserMedia constraints=", constraints)
+              // navigator.mediaDevices.getDisplayMedia(constraints)
+              Ion.LocalStream.getDisplayMedia(constraints)
+                .then((media) => {
+                  localVideo2.srcObject = media;
+                  localVideo2.autoplay = true;
+                  localVideo2.controls = true;
+                  localVideo2.muted = true;
+
+                  rtc.publish(media);
+                })
+                .catch(console.error)
               Ion.LocalStream.getUserMedia(constraints)
                 .then((media) => {
                   localStream = media;
@@ -219,7 +234,7 @@ const pingWebSocket = () => {
     sockets.forEach(function (socket) {
       if (socket.readyState === 1) {
         socket.send(msg);
-        console.log("Pinging every 30 secs at ", socket.url);
+        // console.log("Pinging every 10 secs at ", socket.url);
       }
     });
   }
@@ -233,18 +248,18 @@ const send = () => {
       return
     };
 
-    var attachment = {
-      name: "testFile",
-      size: 100,
-      file_path: localData.value, //<<--- set this to 'filepath' from presigned upload GET response
-    };
+    // var attachment = {
+    //   name: "testFile",
+    //   size: 100,
+    //   file_path: localData.value, //<<--- set this to 'filepath' from presigned upload GET response
+    // };
 
     var data = {
       uid: uid,
       name: "test",
       text: localData.value,
-      file: attachment,
-      mime_type: "attachment"
+      // file: attachment,
+      mime_type: "message"
     };
 
     let map = new Map();
