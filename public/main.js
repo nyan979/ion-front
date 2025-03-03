@@ -20,26 +20,13 @@ const brTag = document.getElementById("br-tag");
 let localDataChannel;
 let trackEvent;
 
-// const url = 'http://vidconf:5551';
-// const url = "https://ucs-signal.soh-dev.agilrad.com";
-// const url = "http://signal.dev2.ar2";
-const url = 'http://localhost:5551';
-const uid = uuid();
-// const uid = "221d1c91-120d-4b53-8b51-8caec4154cf4";
-const sid = "cbc700c7-d909-4c6d-ad11-f81681b82141"; //soh
-// const sid = "60d76c67-66ef-461f-8a96-26dd3d56b012"; //138
-// const sid = "a62c6cfd-a94f-4e33-a28e-054c9e956196"; //dev2
-// const config = {
-//   iceServers: [
-//       {
-//           urls: ['stun:ucs-stun.soh-dev.agilrad.com:3478'],
-//       },
-//   ],
-// }
+const url = 'http://ucs-signal.172.17.0.1.nip.io';
+// const uid = "f67cb8f5-0645-444d-a4bd-c61aaf1b2db0";
+// const sid = "9dc52499-6dce-43f0-b1b2-2a801f153708"; //dev2
 const config = {
   iceServers: [
     {
-      urls: ['stun:stunserver.soh-dev.agilrad.com:3478'],
+      urls: ['stun:stun.l.google.com:19302'],
     },
     // {
     //   urls: ['turn:ucs-turn.dev2.ar2:3478'],
@@ -56,6 +43,10 @@ let presignedUrl;
 let connector;
 let sockets = [];
 
+let sid;
+let uid;
+let token;
+
 const join = async () => {
     // const originalSend = WebSocket.prototype.send;
     // WebSocket.prototype.send = function(...args) {
@@ -64,9 +55,14 @@ const join = async () => {
     //   console.log(sockets)
     //   return originalSend.call(this, ...args);
     // };
+    sid = document.getElementById("roomId").value;
+    uid = document.getElementById("userId").value;
+    token = document.getElementById("token").value;
 
     console.log("[join]: sid="+sid+" uid=", uid)
-    connector = new Ion.Connector(url, "token");
+    console.log("[join]: token=", token)
+
+    connector = new Ion.Connector(url, token);
     
     connector.onopen = function (service){
         console.log("[onopen]: service = ", service.name);
@@ -91,7 +87,7 @@ const join = async () => {
         const uint8Arr = new Uint8Array(msg.data);
         const decodedString = String.fromCharCode.apply(null, uint8Arr);
         const json  = JSON.parse(decodedString);
-        remoteData.innerHTML = remoteData.innerHTML + json.msg+ '\n';
+        remoteData.innerHTML = remoteData.innerHTML + json.msg.text+ '\n';
     };
     
     room.onpeerevent = function (event){
@@ -248,17 +244,18 @@ const send = () => {
       return
     };
 
-    // var attachment = {
-    //   name: "testFile",
-    //   size: 100,
-    //   file_path: localData.value, //<<--- set this to 'filepath' from presigned upload GET response
-    // };
+    var attachment = {
+      name: "testFile",
+      size: 100,
+      content_type: "image/jpeg",
+      file_id: "f67cb8f5-0645-444d-a4bd-c61aaf1b2db0",//<<--- set this to 'file_id' from presigned upload GET response, must be in UUID format
+    };
 
     var data = {
       uid: uid,
       name: "test",
       text: localData.value,
-      // file: attachment,
+      attachment: attachment,
       mime_type: "message"
     };
 
