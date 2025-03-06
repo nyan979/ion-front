@@ -20,9 +20,6 @@ const brTag = document.getElementById("br-tag");
 let localDataChannel;
 let trackEvent;
 
-const url = 'http://ucs-signal.172.17.0.1.nip.io';
-// const uid = "f67cb8f5-0645-444d-a4bd-c61aaf1b2db0";
-// const sid = "9dc52499-6dce-43f0-b1b2-2a801f153708"; //dev2
 const config = {
   iceServers: [
     {
@@ -43,6 +40,7 @@ let presignedUrl;
 let connector;
 let sockets = [];
 
+let signalUrl;
 let sid;
 let uid;
 let token;
@@ -55,6 +53,7 @@ const join = async () => {
     //   console.log(sockets)
     //   return originalSend.call(this, ...args);
     // };
+    signalUrl = document.getElementById("signalUrl").value;
     sid = document.getElementById("roomId").value;
     uid = document.getElementById("userId").value;
     token = document.getElementById("token").value;
@@ -62,7 +61,7 @@ const join = async () => {
     console.log("[join]: sid="+sid+" uid=", uid)
     console.log("[join]: token=", token)
 
-    connector = new Ion.Connector(url, token);
+    connector = new Ion.Connector(signalUrl, token);
     
     connector.onopen = function (service){
         console.log("[onopen]: service = ", service.name);
