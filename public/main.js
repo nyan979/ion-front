@@ -1,42 +1,39 @@
 const localVideo = document.getElementById("local-video");
-const localVideo2 = document.getElementById("local-video2");
 const remotesDiv = document.getElementById("remotes");
 
 /* eslint-env browser */
 const joinBtn = document.getElementById("join-btn");
 const leaveBtn = document.getElementById("leave-btn");
 const publishBtn = document.getElementById("publish-btn");
-const publishSBtn = document.getElementById("publish-simulcast-btn");
+const publishSBtn = document.getElementById("publish-sharedscreen-btn");
 
 const codecBox = document.getElementById("select-box1");
 const resolutionBox = document.getElementById("select-box2");
 const simulcastBox = document.getElementById("check-box");
 const localData = document.getElementById("local-data");
 const remoteData = document.getElementById("remote-data");
-const remoteSignal= document.getElementById("remote-signal");
+const remoteSignal = document.getElementById("remote-signal");
 const subscribeBox = document.getElementById("select-box3");
 const sizeTag = document.getElementById("size-tag");
 const brTag = document.getElementById("br-tag");
-let localDataChannel;
 let trackEvent;
 
 const config = {
-  iceServers: [
-    {
-      urls: ['stun:stun.l.google.com:19302'],
-    },
-    // {
-    //   urls: ['turn:ucs-turn.dev2.ar2:3478'],
-    //   username: "pion",
-    //   credential: "ion",
-    // },
-  ],
+    iceServers: [
+        {
+            urls: ['stun:stun.l.google.com:19302'],
+        },
+        // {
+        //   urls: ['turn:ucs-turn.dev2.ar2:3478'],
+        //   username: "pion",
+        //   credential: "ion",
+        // },
+    ],
 }
 let room;
 let rtc;
 let localStream;
 let start;
-let presignedUrl;
 let connector;
 let sockets = [];
 
@@ -46,51 +43,44 @@ let uid;
 let token;
 
 const join = async () => {
-    // const originalSend = WebSocket.prototype.send;
-    // WebSocket.prototype.send = function(...args) {
-    //   if (sockets.indexOf(this) === -1)
-    //     sockets.push(this);
-    //   console.log(sockets)
-    //   return originalSend.call(this, ...args);
-    // };
     signalUrl = document.getElementById("signalUrl").value;
     sid = document.getElementById("roomId").value;
     uid = document.getElementById("userId").value;
     token = document.getElementById("token").value;
 
-    console.log("[join]: sid="+sid+" uid=", uid)
+    console.log("[join]: sid=" + sid + " uid=", uid)
     console.log("[join]: token=", token)
 
     connector = new Ion.Connector(signalUrl, token);
-    
-    connector.onopen = function (service){
+
+    connector.onopen = function (service) {
         console.log("[onopen]: service = ", service.name);
     };
 
-    connector.onclose = function (service){
+    connector.onclose = function (service) {
         console.log('[onclose]: service = ' + service.name);
     };
 
     room = new Ion.Room(connector);
-    
-    room.onjoin = function (result){
+
+    room.onjoin = function (result) {
         console.log('[onjoin]: success ' + result.success + ', room info: ' + JSON.stringify(result.room));
     };
-    
-    room.onleave = function (reason){
+
+    room.onleave = function (reason) {
         console.log('[onleave]: leave room, reason ' + reason);
     };
-    
-    room.onmessage = function (msg){
-        console.log('[onmessage]: Received msg:',  msg)
+
+    room.onmessage = function (msg) {
+        console.log('[onmessage]: Received msg:', msg)
         const uint8Arr = new Uint8Array(msg.data);
         const decodedString = String.fromCharCode.apply(null, uint8Arr);
-        const json  = JSON.parse(decodedString);
-        remoteData.innerHTML = remoteData.innerHTML + json.msg.text+ '\n';
+        const json = JSON.parse(decodedString);
+        remoteData.innerHTML = remoteData.innerHTML + json.msg.text + '\n';
     };
-    
-    room.onpeerevent = function (event){
-        switch(event.state) {
+
+    room.onpeerevent = function (event) {
+        switch (event.state) {
             case Ion.PeerState.JOIN:
                 console.log('[onpeerevent]: Peer ' + event.peer.uid + ' joined');
                 break;
@@ -102,15 +92,15 @@ const join = async () => {
                 break;
         }
     };
-    
-    room.onroominfo = function (info){
+
+    room.onroominfo = function (info) {
         console.log('[onroominfo]: ' + JSON.stringify(info));
     };
-    
-    room.ondisconnect = function (dis){
+
+    room.ondisconnect = function (dis) {
         console.log('[ondisconnect]: Disconnected from server ' + dis);
     };
-    
+
     const result = await room.join({
         sid: sid,
         uid: uid,
@@ -131,50 +121,47 @@ const join = async () => {
             publishBtn.removeAttribute('disabled');
             publishSBtn.removeAttribute('disabled');
 
-            // setInterval(pingWebSocket, 2000);
-
             rtc = new Ion.RTC(connector, config);
-            // rtc = new Ion.RTC(connector);
 
             rtc.ontrack = (track, stream) => {
-              console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
-              if (track.kind === "video") {
-                track.onunmute = () => {
-                  if (!streams[stream.id]) {
-                    const remoteVideo = document.createElement("video");
-                    remoteVideo.srcObject = stream;
-                    remoteVideo.autoplay = true;
-                    remoteVideo.muted = true;
-                    remoteVideo.addEventListener("loadedmetadata", function () {
-                      sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
-                    });
-            
-                    remoteVideo.onresize = function () {
-                      sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+                console.log("got ", track.kind, " track", track.id, "for stream", stream.id);
+                if (track.kind === "video") {
+                    track.onunmute = () => {
+                        if (!streams[stream.id]) {
+                            const remoteVideo = document.createElement("video");
+                            remoteVideo.srcObject = stream;
+                            remoteVideo.autoplay = true;
+                            remoteVideo.muted = true;
+                            remoteVideo.addEventListener("loadedmetadata", function () {
+                                sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+                            });
+
+                            remoteVideo.onresize = function () {
+                                sizeTag.innerHTML = `${remoteVideo.videoWidth}x${remoteVideo.videoHeight}`;
+                            };
+                            remotesDiv.appendChild(remoteVideo);
+                            streams[stream.id] = stream;
+                            stream.onremovetrack = () => {
+                                if (streams[stream.id]) {
+                                    remotesDiv.removeChild(remoteVideo);
+                                    streams[stream.id] = null;
+                                }
+                            };
+                            getStats();
+                        }
                     };
-                    remotesDiv.appendChild(remoteVideo);
-                    streams[stream.id] = stream;
-                    stream.onremovetrack = () => {
-                      if (streams[stream.id]) {
-                        remotesDiv.removeChild(remoteVideo);
-                        streams[stream.id] = null;
-                      }
-                    };
-                    getStats();
-                  }
-                };
-              }
-              subscribe();
+                }
+                subscribe();
             };
 
             rtc.ontrackevent = function (ev) {
-              console.log("ontrackevent: \nuid = ", ev.uid, " \nstate = ", ev.state, ", \ntracks = ", JSON.stringify(ev.tracks));
-              if (trackEvent === undefined) {
-                console.log("store trackEvent=", ev)
-                trackEvent = ev;
-              }
-              remoteSignal.innerHTML = remoteSignal.innerHTML + JSON.stringify(ev) + '\n';
-              subscribe();
+                console.log("ontrackevent: \nuid = ", ev.uid, " \nstate = ", ev.state, ", \ntracks = ", JSON.stringify(ev.tracks));
+                if (trackEvent === undefined) {
+                    console.log("store trackEvent=", ev)
+                    trackEvent = ev;
+                }
+                remoteSignal.innerHTML = remoteSignal.innerHTML + JSON.stringify(ev) + '\n';
+                subscribe();
             };
 
             rtc.join(sid, uid);
@@ -182,80 +169,66 @@ const join = async () => {
             const streams = {};
 
             start = (sc) => {
-              publishSBtn.disabled = "true";
-              publishBtn.disabled = "true";
+                publishSBtn.disabled = "true";
+                publishBtn.disabled = "true";
 
-              let constraints = {
-                resolution: resolutionBox.options[resolutionBox.selectedIndex].value,
-                codec: codecBox.options[codecBox.selectedIndex].value,
-                audio: true,
-                simulcast: sc,
-              }
-              console.log("getUserMedia constraints=", constraints)
-              // navigator.mediaDevices.getDisplayMedia(constraints)
-              Ion.LocalStream.getDisplayMedia(constraints)
-                .then((media) => {
-                  localVideo2.srcObject = media;
-                  localVideo2.autoplay = true;
-                  localVideo2.controls = true;
-                  localVideo2.muted = true;
+                let constraints = {
+                    resolution: resolutionBox.options[resolutionBox.selectedIndex].value,
+                    codec: codecBox.options[codecBox.selectedIndex].value,
+                    audio: false,
+                    simulcast: false,
+                }
+                console.log("getUserMedia constraints=", constraints)
+                if (sc) {
+                    Ion.LocalStream.getDisplayMedia(constraints)
+                        .then((media) => {
+                            localStream = media;
+                            localVideo.srcObject = media;
+                            localVideo.autoplay = true;
+                            localVideo.controls = true;
+                            localVideo.muted = true;
 
-                  rtc.publish(media);
-                })
-                .catch(console.error)
-              Ion.LocalStream.getUserMedia(constraints)
-                .then((media) => {
-                  localStream = media;
-                  localVideo.srcObject = media;
-                  localVideo.autoplay = true;
-                  localVideo.controls = true;
-                  localVideo.muted = true;
+                            rtc.publish(media);
+                        })
+                        .catch(console.error);
+                } else {
+                    Ion.LocalStream.getUserMedia(constraints)
+                        .then((media) => {
+                            localStream = media;
+                            localVideo.srcObject = media;
+                            localVideo.autoplay = true;
+                            localVideo.controls = true;
+                            localVideo.muted = true;
 
-                  rtc.publish(media);
-                  localDataChannel = rtc.createDataChannel('ion-sfu');
-                  localDataChannel.onopen = () => localDataChannel.send("Hello World");
-                  localDataChannel.onmessage = function (msg){
-                    console.log('[onmessage]: Received msg:',  msg);
-                  };
-                })
-                .catch(console.error);
+                            rtc.publish(media);
+                        })
+                        .catch(console.error);
+                }
             };
-    });
-}
-
-const pingWebSocket = () => {
-  var msg = new Blob([""], { type: "text/plain" });
-  if (sockets.length > 0) {
-    sockets.forEach(function (socket) {
-      if (socket.readyState === 1) {
-        socket.send(msg);
-        // console.log("Pinging every 10 secs at ", socket.url);
-      }
-    });
-  }
+        });
 }
 
 const send = () => {
     if (!room) {
         alert('join room first!', '', {
-        confirmButtonText: 'OK',
-      });
-      return
-    };
+            confirmButtonText: 'OK',
+        });
+        return
+    }
 
-    var attachment = {
-      name: "testFile",
-      size: 100,
-      content_type: "image/jpeg",
-      file_id: "f67cb8f5-0645-444d-a4bd-c61aaf1b2db0",//<<--- set this to 'file_id' from presigned upload GET response, must be in UUID format
-    };
+    // var attachment = {
+    //     name: "testFile",
+    //     size: 100,
+    //     content_type: "image/jpeg",
+    //     file_id: "f67cb8f5-0645-444d-a4bd-c61aaf1b2db0",//<<--- set this to 'file_id' from presigned upload GET response, must be in UUID format
+    // };
 
     var data = {
-      uid: uid,
-      name: "test",
-      text: localData.value,
-      attachment: attachment,
-      mime_type: "message"
+        uid: uid,
+        name: "test",
+        text: localData.value,
+        // attachment: attachment,
+        mime_type: "message"
     };
 
     let map = new Map();
@@ -279,22 +252,22 @@ const subscribe = () => {
     console.log("subscribe trackEvent=", trackEvent, "layer=", layer)
     var infos = [];
     trackEvent.tracks.forEach(t => {
-        if (t.layer === layer && t.kind === "video"){
-          infos.push({
-            track_id: t.id,
-            mute: t.muted,
-            layer: t.layer,
-            subscribe: true
-          });
+        if (t.layer === layer && t.kind === "video") {
+            infos.push({
+                track_id: t.id,
+                mute: t.muted,
+                layer: t.layer,
+                subscribe: true
+            });
         }
-        
-        if (t.kind === "audio"){
-          infos.push({
-            track_id: t.id,
-            mute: t.muted,
-            layer: t.layer,
-            subscribe: true
-          });
+
+        if (t.kind === "audio") {
+            infos.push({
+                track_id: t.id,
+                mute: t.muted,
+                layer: t.layer,
+                subscribe: true
+            });
         }
     });
     console.log("subscribe infos=", infos)
@@ -302,73 +275,60 @@ const subscribe = () => {
 }
 
 
-
 const controlLocalVideo = (radio) => {
-  if (radio.value === "false") {
-    localStream.mute("video");
-  } else {
-    localStream.unmute("video");
-  }
+    if (radio.value === "false") {
+        localStream.mute("video");
+    } else {
+        localStream.unmute("video");
+    }
 };
 
 const controlLocalAudio = (radio) => {
-  if (radio.value === "false") {
-    localStream.mute("audio");
-  } else {
-    localStream.unmute("audio");
-  }
+    if (radio.value === "false") {
+        localStream.mute("audio");
+    } else {
+        localStream.unmute("audio");
+    }
 };
 
 const getStats = () => {
-  let bytesPrev;
-  let timestampPrev;
-  setInterval(() => {
-    rtc.getSubStats(null).then((results) => {
-      results.forEach((report) => {
-        const now = report.timestamp;
+    let bytesPrev;
+    let timestampPrev;
+    setInterval(() => {
+        rtc.getSubStats(null).then((results) => {
+            results.forEach((report) => {
+                const now = report.timestamp;
 
-        let bitrate;
-        if (
-          report.type === "inbound-rtp" &&
-          report.mediaType === "video"
-        ) {
-          const bytes = report.bytesReceived;
-          if (timestampPrev) {
-            bitrate = (8 * (bytes - bytesPrev)) / (now - timestampPrev);
-            bitrate = Math.floor(bitrate);
-          }
-          bytesPrev = bytes;
-          timestampPrev = now;
-        }
-        if (bitrate) {
-          brTag.innerHTML = `${bitrate} kbps @ ${report.framesPerSecond} fps`;
-        }
-      });
-    });
-  }, 1000);
+                let bitrate;
+                if (
+                    report.type === "inbound-rtp" &&
+                    report.mediaType === "video"
+                ) {
+                    const bytes = report.bytesReceived;
+                    if (timestampPrev) {
+                        bitrate = (8 * (bytes - bytesPrev)) / (now - timestampPrev);
+                        bitrate = Math.floor(bitrate);
+                    }
+                    bytesPrev = bytes;
+                    timestampPrev = now;
+                }
+                if (bitrate) {
+                    brTag.innerHTML = `${bitrate} kbps @ ${report.framesPerSecond} fps`;
+                }
+            });
+        });
+    }, 1000);
 };
 
-function syntaxHighlight(json) {
-  json = json
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  return json.replace(
-    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-    function (match) {
-      let cls = "number";
-      if (/^"/.test(match)) {
-        if (/:$/.test(match)) {
-          cls = "key";
-        } else {
-          cls = "string";
-        }
-      } else if (/true|false/.test(match)) {
-        cls = "boolean";
-      } else if (/null/.test(match)) {
-        cls = "null";
-      }
-      return '<span class="' + cls + '">' + match + "</span>";
+const pingWebSocket = () => {
+    var msg = new Blob([""], {type: "text/plain"});
+    if (sockets.length > 0) {
+        sockets.forEach(function (socket) {
+            if (socket.readyState === 1) {
+                socket.send(msg);
+                // console.log("Pinging every 10 secs at ", socket.url);
+            }
+        });
     }
-  );
 }
+
